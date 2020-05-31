@@ -43,7 +43,7 @@ def handle_messages():
                     sender_id = messaging_event["sender"]["id"]
                     # recipient_id = messaging_event["recipient"]["id"]
                     message_text = str(messaging_event["message"]["text"])
-                    if "!" in message_text: log("! in message_text")
+
                     send_message(sender_id, message_text)
 
                 if messaging_event.get("delivery"):
@@ -78,6 +78,7 @@ def send_message(recipient_id, message_text):
             "text": msg
         }
     })
+    log(data)
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
     if r.status_code != 200:
         log(r.status_code)
@@ -166,7 +167,7 @@ def handle_stat_req(message):
         msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "\n\n"
 
     if "!help" in message:
-        help(messages)
+        msg += help(messages)
 
     log(msg)
 
