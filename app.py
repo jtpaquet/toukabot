@@ -66,7 +66,7 @@ def send_message(recipient_id, message_text):
     # if "@M. Touka-poom" in message_text:
     msg = ""
     if "!" in message_text:
-        handle_stat_req(message_text)
+        msg = handle_stat_req(message_text)
     if msg == "":
         msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
 
@@ -101,38 +101,38 @@ def handle_stat_req(message):
     msg = ""
 
     if "!msg" in message: # Tested
-        msg += "Overall messageschr(10)"
+        msg += "Overall messages\n"
         stats = list(messages.aggregate( [ { "$collStats": { "storageStats": { } } } ] ))[0]['storageStats']['count']
-        msg += f"{stats}chr(10)chr(10)"
+        msg += f"{stats}\n\n"
 
     if "!birth" in message: # Tested
-        msg += "Création de Toukachr(10)"
+        msg += "Création de Touka\n"
         date_min = list(messages.aggregate([{"$group":{"_id": {}, "date_min": { "$min": "$timestamp" }}}]))[0]['date_min']
-        msg += str(datetime.fromtimestamp(date_min/1000)) +"chr(10)chr(10)"
+        msg += str(datetime.fromtimestamp(date_min/1000)) +"\n\n"
 
     if "!members" in message: # Tested, rajouter depuis quand ils sont membres
-        msg += "Membreschr(10)"
+        msg += "Membres\n"
         for m in sorted(pseudos.values()):
-            msg += f"{m}chr(10)"
-        msg += "chr(10)"
+            msg += f"{m}\n"
+        msg += "\n"
 
     if "!overall_msg" in message: # Tested
-        msg += "Overall messages rankingchr(10)"
+        msg += "Overall messages ranking\n"
         stats = {pseudos[d['_id']] : d['count'] for d in list(messages.aggregate([{"$sortByCount": "$author"}]))}
         for key in stats.keys():
-            msg += f"{key} : {str(stats[key])} chr(10)"
+            msg += f"{key} : {str(stats[key])} \n"
         msg += f"Total : {sum(stats.values())}"
-        msg += "chr(10)"
+        msg += "\n"
 
     if "!overall_word" in message: # Tested
-        msg += "Overall words rankingchr(10)"
+        msg += "Overall words ranking\n"
         n_word_pipeline = [{"$match": {"content": {"$exists":True}}},{"$project": {"author": 1, "n_word": {"$size": {"$split": ["$content", " "]}}}}, {"$group" : { "_id" : "$author", "n_word" : {"$sum":"$n_word"}}}]
         stats = {pseudos[d['_id']] : d['n_word'] for d in list(messages.aggregate(n_word_pipeline))}
         stats = {k: v for k, v in sorted(stats.items(), key=lambda item: item[1])[::-1]}
         for key in stats.keys():
-            msg += f"{key} : {str(stats[key])}chr(10)"
+            msg += f"{key} : {str(stats[key])}\n"
         msg += f"Total : {sum(stats.values())}"
-        msg += "chr(10)"
+        msg += "\n"
 
     # if "!msg_month" in message:
     #     msg += ""
@@ -141,53 +141,54 @@ def handle_stat_req(message):
     #     msg += ""
 
     if "!reactions_made" in message: # Tested
-        "Reactions madechr(10)"
+        "Reactions made\n"
         react_made_by_actor_pipeline = [{"$unwind": "$reactions"}, {"$sortByCount": "$reactions.actor"}]
         stats = list(messages.aggregate(react_made_by_actor_pipeline))
         for elem in stats: 
-            msg += f"{elem['_id']} : {elem['count']}chr(10)"
-        msg += "chr(10)"
+            msg += f"{elem['_id']} : {elem['count']}\n"
+        msg += "\n"
 
     # if "!reactions_received" in message:
-    #     "Reactions receivedchr(10)"
+    #     "Reactions received\n"
     #     react_received_by_author_pipeline = [{ "$group": {"_id": "$author", "count": {"$sum":  {"$size": "$reactions"}}} }]
     #     stats = list(messages.aggregate(react_received_by_author_pipeline))
     #     for elem in stats: 
-    #         msg += f"{elem['_id']} : {elem['count']}chr(10)"
-    #     msg += "chr(10)"
+    #         msg += f"{elem['_id']} : {elem['count']}\n"
+    #     msg += "\n"
     # return msg
 
     if "!random" in message:
-        "Random messagechr(10)"
+        "Random message\n"
         pipeline = [{ "$sample": { "size": 1 } }]
         r_msg = list(messages.aggregate(pipeline))[0]
         while 'content' not in r_msg.keys():
             r_msg = list(messages.aggregate(pipeline))[0]
-        msg += f"{pseudos[r_msg['author']]} : {r_msg['content']}chr(10)"
-        msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "chr(10)chr(10)"
+        msg += f"{pseudos[r_msg['author']]} : {r_msg['content']}\n"
+        msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "\n\n"
 
     if "!help" in message:
         msg += help(messages)
 
     log(msg)
+    return msg
 
 
 def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
     
-    msg = "Je suis M. Touka-poomchr(10)"
-    msg += f"Statistiques en date du {datetime.fromtimestamp(date_max/1000)}chr(10)"
-    msg += "Messages total: !msgchr(10)"
-    msg += "Création de Touka: !birthchr(10)"
-    msg += "Membres: !memberschr(10)"
-    msg += "Classement global: !overall_msgchr(10)"
-    msg += "Classement global (mots): !overall_wordchr(10)"
-    # msg += "Classement pour un certain mois: !msg_month mm-aaaachr(10)"
-    # msg += "Classement de messages pour une année: !msg_year aaaachr(10)"
-    msg += "Classement pour les réaction faites: !reactions_madechr(10)"
-    # msg += "Classement pour les réaction reçues: !reactions_receivedchr(10)"
-    msg += "Message random: !randomchr(10)"
-    msg += "Help: !helpchr(10)"
+    msg = "Je suis M. Touka-poom\n"
+    msg += f"Statistiques en date du {datetime.fromtimestamp(date_max/1000)}\n"
+    msg += "Messages total: !msg\n"
+    msg += "Création de Touka: !birth\n"
+    msg += "Membres: !members\n"
+    msg += "Classement global: !overall_msg\n"
+    msg += "Classement global (mots): !overall_word\n"
+    # msg += "Classement pour un certain mois: !msg_month mm-aaaa\n"
+    # msg += "Classement de messages pour une année: !msg_year aaaa\n"
+    msg += "Classement pour les réaction faites: !reactions_made\n"
+    # msg += "Classement pour les réaction reçues: !reactions_received\n"
+    msg += "Message random: !random\n"
+    msg += "Help: !help\n"
     return msg
 
 
