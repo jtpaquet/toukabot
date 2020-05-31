@@ -101,38 +101,38 @@ def handle_stat_req(message):
     msg = ""
 
     if "!msg" in message: # Tested
-        msg += "Overall messages\n"
+        msg += "Overall messageschr(10)"
         stats = list(messages.aggregate( [ { "$collStats": { "storageStats": { } } } ] ))[0]['storageStats']['count']
-        msg += f"{stats}\n\n"
+        msg += f"{stats}chr(10)chr(10)"
 
     if "!birth" in message: # Tested
-        msg += "Création de Touka\n"
+        msg += "Création de Toukachr(10)"
         date_min = list(messages.aggregate([{"$group":{"_id": {}, "date_min": { "$min": "$timestamp" }}}]))[0]['date_min']
-        msg += str(datetime.fromtimestamp(date_min/1000)) +"\n\n"
+        msg += str(datetime.fromtimestamp(date_min/1000)) +"chr(10)chr(10)"
 
     if "!members" in message: # Tested, rajouter depuis quand ils sont membres
-        msg += "Membres\n"
+        msg += "Membreschr(10)"
         for m in sorted(pseudos.values()):
-            msg += f"{m}\n"
-        msg += "\n"
+            msg += f"{m}chr(10)"
+        msg += "chr(10)"
 
     if "!overall_msg" in message: # Tested
-        msg += "Overall messages ranking\n"
+        msg += "Overall messages rankingchr(10)"
         stats = {pseudos[d['_id']] : d['count'] for d in list(messages.aggregate([{"$sortByCount": "$author"}]))}
         for key in stats.keys():
-            msg += f"{key} : {str(stats[key])} \n"
+            msg += f"{key} : {str(stats[key])} chr(10)"
         msg += f"Total : {sum(stats.values())}"
-        msg += "\n"
+        msg += "chr(10)"
 
     if "!overall_word" in message: # Tested
-        msg += "Overall words ranking\n"
+        msg += "Overall words rankingchr(10)"
         n_word_pipeline = [{"$match": {"content": {"$exists":True}}},{"$project": {"author": 1, "n_word": {"$size": {"$split": ["$content", " "]}}}}, {"$group" : { "_id" : "$author", "n_word" : {"$sum":"$n_word"}}}]
         stats = {pseudos[d['_id']] : d['n_word'] for d in list(messages.aggregate(n_word_pipeline))}
         stats = {k: v for k, v in sorted(stats.items(), key=lambda item: item[1])[::-1]}
         for key in stats.keys():
-            msg += f"{key} : {str(stats[key])}\n"
+            msg += f"{key} : {str(stats[key])}chr(10)"
         msg += f"Total : {sum(stats.values())}"
-        msg += "\n"
+        msg += "chr(10)"
 
     # if "!msg_month" in message:
     #     msg += ""
@@ -141,30 +141,30 @@ def handle_stat_req(message):
     #     msg += ""
 
     if "!reactions_made" in message: # Tested
-        "Reactions made\n"
+        "Reactions madechr(10)"
         react_made_by_actor_pipeline = [{"$unwind": "$reactions"}, {"$sortByCount": "$reactions.actor"}]
         stats = list(messages.aggregate(react_made_by_actor_pipeline))
         for elem in stats: 
-            msg += f"{elem['_id']} : {elem['count']}\n"
-        msg += "\n"
+            msg += f"{elem['_id']} : {elem['count']}chr(10)"
+        msg += "chr(10)"
 
     # if "!reactions_received" in message:
-    #     "Reactions received\n"
+    #     "Reactions receivedchr(10)"
     #     react_received_by_author_pipeline = [{ "$group": {"_id": "$author", "count": {"$sum":  {"$size": "$reactions"}}} }]
     #     stats = list(messages.aggregate(react_received_by_author_pipeline))
     #     for elem in stats: 
-    #         msg += f"{elem['_id']} : {elem['count']}\n"
-    #     msg += "\n"
+    #         msg += f"{elem['_id']} : {elem['count']}chr(10)"
+    #     msg += "chr(10)"
     # return msg
 
     if "!random" in message:
-        "Random message\n"
+        "Random messagechr(10)"
         pipeline = [{ "$sample": { "size": 1 } }]
         r_msg = list(messages.aggregate(pipeline))[0]
         while 'content' not in r_msg.keys():
             r_msg = list(messages.aggregate(pipeline))[0]
-        msg += f"{pseudos[r_msg['author']]} : {r_msg['content']}\n"
-        msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "\n\n"
+        msg += f"{pseudos[r_msg['author']]} : {r_msg['content']}chr(10)"
+        msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "chr(10)chr(10)"
 
     if "!help" in message:
         msg += help(messages)
@@ -175,19 +175,19 @@ def handle_stat_req(message):
 def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
     
-    msg = "Je suis M. Touka-poom\n"
-    msg += f"Statistiques en date du {datetime.fromtimestamp(date_max/1000)}\n"
-    msg += "Messages total: !msg\n"
-    msg += "Création de Touka: !birth\n"
-    msg += "Membres: !members\n"
-    msg += "Classement global: !overall_msg\n"
-    msg += "Classement global (mots): !overall_word\n"
-    # msg += "Classement pour un certain mois: !msg_month mm-aaaa\n"
-    # msg += "Classement de messages pour une année: !msg_year aaaa\n"
-    msg += "Classement pour les réaction faites: !reactions_made\n"
-    # msg += "Classement pour les réaction reçues: !reactions_received\n"
-    msg += "Message random: !random\n"
-    msg += "Help: !help\n"
+    msg = "Je suis M. Touka-poomchr(10)"
+    msg += f"Statistiques en date du {datetime.fromtimestamp(date_max/1000)}chr(10)"
+    msg += "Messages total: !msgchr(10)"
+    msg += "Création de Touka: !birthchr(10)"
+    msg += "Membres: !memberschr(10)"
+    msg += "Classement global: !overall_msgchr(10)"
+    msg += "Classement global (mots): !overall_wordchr(10)"
+    # msg += "Classement pour un certain mois: !msg_month mm-aaaachr(10)"
+    # msg += "Classement de messages pour une année: !msg_year aaaachr(10)"
+    msg += "Classement pour les réaction faites: !reactions_madechr(10)"
+    # msg += "Classement pour les réaction reçues: !reactions_receivedchr(10)"
+    msg += "Message random: !randomchr(10)"
+    msg += "Help: !helpchr(10)"
     return msg
 
 
