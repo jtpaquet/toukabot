@@ -167,6 +167,8 @@ def handle_stat_req(message):
     if "!help" in message:
         help(messages)
 
+    log(msg)
+
 
 def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
