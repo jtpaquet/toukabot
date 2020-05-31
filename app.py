@@ -85,6 +85,7 @@ def handle_stat_req(message):
     messages = database['messages_23avril2020']
     pseudos = {author['name'] : author['pseudo'] for author in list(members.find())}
     connection.close()
+    msg = ""
 
     if "!msg" in message: # Tested
         msg += "Overall messages\n"
