@@ -11,6 +11,9 @@ app = Flask(__name__)
 
 bot = Bot(PAGE_ACCESS_TOKEN)
 
+@app.route('/', methods=['GET'])
+def root():
+    return "salut la gang", 200
 
 @app.route('/webhook', methods=['GET'])
 # Webhook verification
@@ -19,7 +22,7 @@ def handle_verification():
         if request.args.get('hub.verify_token', '') != VERIFY_TOKEN:
             return "Error, wrong validation token", 403
         return request.args['hub.challenge'], 200
-    return "salut la gang", 200
+    return "Webhook successful", 200
 
 
 @app.route('/', methods=['POST'])
