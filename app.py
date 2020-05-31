@@ -12,10 +12,6 @@ app = Flask(__name__)
 bot = Bot(PAGE_ACCESS_TOKEN)
 
 @app.route('/', methods=['GET'])
-def root():
-    return "salut la gang", 200
-
-@app.route('/webhook', methods=['GET'])
 # Webhook verification
 def handle_verification():
     if request.args.get('hub.mode') == 'subscribe' and request.args.get('hub.challenge'):
@@ -89,4 +85,5 @@ def log(message):  # simple wrapper for logging to stdout on heroku
 
 
 if __name__ == '__main__':
-    app.run(port=80)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
