@@ -20,39 +20,33 @@ def handle_verification():
         return request.args['hub.challenge'], 200
     return "Webhook successful", 200
 
-
+	
 @app.route('/', methods=['POST'])
-def receive_message():
+def handle_messages():
     data = request.get_json()
     log(data)
 
-    if data['object'] == 'page':
-        for entry in data['entry']:
-            for messaging_event in entry['messaging']:
+    if data["object"] == "page":
 
-                # IDs
-                sender_id = messaging_event['sender']['id']
-                recipient_id = messaging_event['recipient']['id']
+        for entry in data["entry"]:
+            for messaging_event in entry["messaging"]:
 
-                if messaging_event.get('message'):
-                    # Extracting text message
-                    if 'text' in messaging_event['message']:
-                        messaging_text = messaging_event['message']['text']
-                    else:
-                        messaging_text = 'no text'
+                if messaging_event.get("message"):
+                    sender_id = messaging_event["sender"]["id"]
+                    recipient_id = messaging_event["recipient"]["id"]
+                    message_text = messaging_event["message"]["text"]
 
-                    response = None
+                    send_message(sender_id, message_text)
 
-                    entity, value = wit_response(messaging_text)
-                    if entity == 'newstype':
-                        response = "Ok, I will send you the {} news".format(str(value))
-                    elif entity == 'location':
-                        response = "Ok, so you live in {0}. Here are top headlines from {0}".format(str(value))
+                if messaging_event.get("delivery"):
+                    pass
 
-                    if response == None:
-                        response = "I have no idea what you are saying!"
-                        
-                    bot.send_text_message(sender_id, response)
+                if messaging_event.get("optin"):
+                    pass
+
+                if messaging_event.get("postback"):
+                    pass
+
     return "ok", 200
 
 
@@ -80,7 +74,7 @@ def send_message(recipient_id, message_text):
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
-    print(message)
+    print str(message)
     sys.stdout.flush()
 
 
