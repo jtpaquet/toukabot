@@ -63,14 +63,14 @@ def send_message(recipient_id, message_text):
 
     params = {"access_token": PAGE_ACCESS_TOKEN}
     headers = {"Content-Type": "application/json"}
-    
-    msg = ""
-    handle_stat_req(message_text)
-    if msg != "":
-        r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=msg)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
+    if "@M. Touka-poom" in message_text:
+        msg = ""
+        handle_stat_req(message_text)
+        if msg != "":
+            r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=msg)
+        if r.status_code != 200:
+            log(r.status_code)
+        log(r.text)
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
