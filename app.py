@@ -34,7 +34,8 @@ def handle_messages():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-
+					log({msg_text:message_text, sender_id:sender_id, recipient_id:recipient_id})
+					
                     send_message(sender_id, message_text)
 
                 if messaging_event.get("delivery"):
