@@ -43,7 +43,7 @@ def handle_messages():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = str(messaging_event["message"]["text"])
-
+                    log(str(type(message_text)))
                     send_message(sender_id, message_text)
 
                 if messaging_event.get("delivery"):
@@ -65,7 +65,8 @@ def send_message(recipient_id, message_text):
     headers = {"Content-Type": "application/json"}
     # if "@M. Touka-poom" in message_text:
     msg = ""
-    handle_stat_req(message_text)
+    if "!" in message_text:
+        handle_stat_req(message_text)
     if msg == "":
         msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
 
