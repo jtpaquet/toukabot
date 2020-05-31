@@ -25,9 +25,8 @@ def handle_verification():
 def handle_messages():
     data = request.get_json()
     log(data)
-
+	
     if data["object"] == "page":
-
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
 
@@ -74,7 +73,7 @@ def send_message(recipient_id, message_text):
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
-    print str(message)
+    print(message)
     sys.stdout.flush()
 
 
