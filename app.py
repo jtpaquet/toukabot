@@ -42,7 +42,7 @@ def handle_messages():
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
-                    message_text = messaging_event["message"]["text"]
+                    message_text = str(messaging_event["message"]["text"])
 
                     send_message(sender_id, message_text)
 
