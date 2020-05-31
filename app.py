@@ -63,14 +63,15 @@ def send_message(recipient_id, message_text):
 
     params = {"access_token": PAGE_ACCESS_TOKEN}
     headers = {"Content-Type": "application/json"}
-    if "@M. Touka-poom" in message_text:
-        msg = ""
-        handle_stat_req(message_text)
-        if msg != "":
-            r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=msg)
-        if r.status_code != 200:
-            log(r.status_code)
-        log(r.text)
+    # if "@M. Touka-poom" in message_text:
+    msg = ""
+    handle_stat_req(message_text)
+    if msg == "":
+        msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=msg)
+    if r.status_code != 200:
+        log(r.status_code)
+    log(r.text)
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
@@ -79,6 +80,7 @@ def log(message):  # simple wrapper for logging to stdout on heroku
 
 def handle_stat_req(message):
     # DB connection
+    log("Connection to database")
     connection = MongoClient(MONGODB_URI)
     database = connection[DBS_NAME]
     members = database['members']
@@ -154,16 +156,10 @@ def handle_stat_req(message):
         msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "\n\n"
 
     if "!help" in message:
-        help()
+        help(messages)
 
 
-def help():
-    # DB connection
-    connection = MongoClient(MONGODB_URI)
-    database = connection[DBS_NAME]
-    messages = database['messages_23avril2020']
-    connection.close()
-    
+def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
     
     msg = "Je suis M. Touka-poom\n"
