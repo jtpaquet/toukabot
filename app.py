@@ -34,9 +34,10 @@ def handle_messages():
                     sender_id = messaging_event["sender"]["id"]
                     recipient_id = messaging_event["recipient"]["id"]
                     message_text = messaging_event["message"]["text"]
-					log(json.dumps({"msg_text":message_text, "sender_id":sender_id, "recipient_id":recipient_id}))
+					msg_data = {"msg_text":str(message_text), "sender_id":str(sender_id), "recipient_id":str(recipient_id)}
+					log(json.dumps(msg_data))
 					
-                    send_message(sender_id, message_text)
+					send_message(sender_id, message_text)
 
                 if messaging_event.get("delivery"):
                     pass
