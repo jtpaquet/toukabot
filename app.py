@@ -68,7 +68,16 @@ def send_message(recipient_id, message_text):
     handle_stat_req(message_text)
     if msg == "":
         msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=msg)
+
+    data = json.dumps({
+        "recipient": {
+            "id": recipient_id
+        },
+        "message": {
+            "text": msg
+        }
+    })
+    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
     if r.status_code != 200:
         log(r.status_code)
     log(r.text)
