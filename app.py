@@ -115,7 +115,8 @@ def handle_stat_req(message):
     if "!birth" in message: # Tested
         msg += "Création de Touka\n"
         date_min = list(messages.aggregate([{"$group":{"_id": {}, "date_min": { "$min": "$timestamp" }}}]))[0]['date_min']
-        msg += str(datetime.fromtimestamp(date_min/1000)) +"\n\n"
+        date_min = datetime.fromtimestamp(date_min/1000).strftime("%d %b %Y")
+        msg += f"{date_min}\n\n"
 
     if "!members" in message: # Tested, rajouter depuis quand ils sont membres
         first_msg = list(messages.aggregate([{"$group": {"_id": "$author", "1st_msg": { "$min": "$timestamp" }}}]))
@@ -210,7 +211,7 @@ def handle_stat_req(message):
 
 def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
-    date_max = datetime.fromtimestamp(date_max/1000).strftime("%d %B %Y")
+    date_max = datetime.fromtimestamp(date_max/1000).strftime("%d %b %Y")
 
     msg = "Je suis M. Touka-poom\n"
     msg += f"Statistiques en date du {date_max}\n"
