@@ -46,8 +46,9 @@ def handle_messages():
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
                     # recipient_id = messaging_event["recipient"]["id"]
-                    message_text = str(messaging_event["message"]["text"])
-
+                    if messaging_event["message"]["text"]:
+                        message_text = str(messaging_event["message"]["text"])
+                        
                     send_message(sender_id, message_text)
 
                 if messaging_event.get("delivery"):
@@ -72,7 +73,7 @@ def send_message(recipient_id, message_text):
     if "!" in message_text:
         msg = handle_stat_req(message_text)
     if msg == "":
-        if random.randint(0,100) >= 35:
+        if random.randint(0,100) >= 95:
             msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
         else: 
             msg = common_reply[random.randint(0,len(common_reply))]
