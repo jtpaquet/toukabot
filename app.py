@@ -3,6 +3,7 @@ import requests
 import sys
 import os
 import json
+import random
 from Credentials import *
 from pymessenger import Bot
 from pymongo import MongoClient
@@ -19,6 +20,9 @@ DBS_NAME = 'ToukaAnalytics'
 FIELDS = {'content': True, 'author' : True, 'timestamp' : True, 'type' : True}
 
 bot = Bot(PAGE_ACCESS_TOKEN)
+
+common_reply = ["Big oumff", "oumff", "moua", "ouais ouais supère", "J'aime bien le froumage", "inks", "ceci être bruh moment", "sa ses vraies", "ceci être ma naturelle position", "oker", "gros jeu", "Fais pas ta tapet", "Criss de centriste", "Ses vraies", "Ferme ta criss de gueule", "Tayeule gros fif", "T'es juste une moumoune", "icksder"]
+
 
 @app.route('/', methods=['GET'])
 # Webhook verification
@@ -68,7 +72,10 @@ def send_message(recipient_id, message_text):
     if "!" in message_text:
         msg = handle_stat_req(message_text)
     if msg == "":
-        msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
+        if random.randint(0,100) >= 35:
+            msg = "Je ne comprends pas, tapez !help pour afficher les commandes."
+        else: 
+            msg = common_reply[random.randint(0,len(common_reply))]
 
     data = json.dumps({
         "recipient": {
@@ -111,10 +118,38 @@ def handle_stat_req(message):
         msg += str(datetime.fromtimestamp(date_min/1000)) +"\n\n"
 
     if "!members" in message: # Tested, rajouter depuis quand ils sont membres
-        msg += "Membres\n"
-        for m in sorted(pseudos.values()):
-            msg += f"{m}\n"
+        first_msg = list(messages.aggregate([{"$group": {"_id": "$author", "1st_msg": { "$min": "$timestamp" }}}]))
+        first_msg = { data['_id'] : data['1st_msg'] for data in first_msg}
+        last_msg = list(messages.aggregate([{"$group": {"_id": "$author", "1st_msg": { "$max": "$timestamp" }}}]))
+        last_msg = { data['_id'] : data['1st_msg'] for data in last_msg}
+        date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
+        date_max = datetime.fromtimestamp(date_max/1000)
+        present_members = {}
+        past_members = {}
+        membs = []
+
+        for m in pseudos.keys():
+            f_msg = datetime.fromtimestamp(first_msg[m]/1000)#.strftime("%B %Y")
+            l_msg = datetime.fromtimestamp(last_msg[m]/1000)
+            membs.append(Member(m, f_msg, l_msg, date_max))
+
+        membs.sort(key=lambda x: x.anciennete, reverse=True)
+
+        for m in membs:
+            if m.status == "present":
+                present_members[m.name] = m.show()
+            if m.status == "past":
+                past_members[m.name] = m.show()
+                            
+        msg += "Membres actuels\n"
+        for m in present_members.keys():
+            msg += f"{m} : {present_members[m]}\n"
+
+        msg += "\nRIP in peace - membres déchues\n"
+        for m in past_members.keys():
+            msg += f"{m} : {past_members[m]}\n"
         msg += "\n"
+        print(msg)              
 
     if "!overall_msg" in message: # Tested
         msg += "Overall messages ranking\n"
@@ -163,8 +198,8 @@ def handle_stat_req(message):
         r_msg = list(messages.aggregate(pipeline))[0]
         while 'content' not in r_msg.keys():
             r_msg = list(messages.aggregate(pipeline))[0]
-        msg += f"{pseudos[r_msg['author']]} : {r_msg['content']}\n"
-        msg += str(datetime.fromtimestamp(r_msg["timestamp"]/1000)) + "\n\n"
+        msg += f""""{r_msg['content']}"\n"""
+        msg +=  f"-{pseudos[r_msg['author']]}, " + datetime.fromtimestamp(r_msg["timestamp"]/1000).strftime("%d %B %Y") + "\n\n"
 
     if "!help" in message:
         msg += help(messages)
@@ -175,9 +210,10 @@ def handle_stat_req(message):
 
 def help(messages):
     date_max = list(messages.aggregate([{"$group":{"_id": {}, "date_max": { "$max": "$timestamp" }}}]))[0]['date_max']
-    
+    date_max = datetime.fromtimestamp(date_max/1000).strftime("%d %B %Y")
+
     msg = "Je suis M. Touka-poom\n"
-    msg += f"Statistiques en date du {datetime.fromtimestamp(date_max/1000)}\n"
+    msg += f"Statistiques en date du {date_max}\n"
     msg += "Messages total: !msg\n"
     msg += "Création de Touka: !birth\n"
     msg += "Membres: !members\n"
