@@ -8,7 +8,7 @@ from Credentials import *
 from pymessenger import Bot
 from pymongo import MongoClient
 from datetime import datetime
-
+from member import Member
 
 
 app = Flask(__name__)
