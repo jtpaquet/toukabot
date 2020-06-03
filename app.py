@@ -23,13 +23,14 @@ bot = Bot(PAGE_ACCESS_TOKEN)
 
 common_reply = ["Big oumff", "oumff", "moua", "ouais ouais supère", "J'aime bien le froumage",
  "inks", "ceci être bruh moment", "sa ses vraies", "ceci être ma naturelle position", "oker", 
- "gros jeu", "Fais pas ta tapet", "Criss de centriste", "Ses vraies", "Ferme ta criss de gueule",
- "Tayeule gros fif", "T'es juste une moumoune", "icksder", "perso moua jvais au barbies", "je m'appelle m. touka poom"
+ "gros jeu", "Ses vraies", "icksder", "perso moua jvais au barbies", "je m'appelle m. touka poom"
  "stu moua ou", "poulet petit bonheur du plaisir à table", "j'ai bien beau être qu'un robot et ne pas avoir de sentiments, mais si je sais une chose, c'est que charles c'est le plus beau mec de la Terre",
- "oh nionnn", "lmak ton manteau sent beaucoup trop le weed", "on se rejoint au desj à 19h", "ses quoi ta passion\nperso moua ses le frisbee"
+ "oh nionnn", "on se rejoint au desj à 19h", "ses quoi ta passion\nperso moua ses le frisbee"
  "oker oker oker, on on fait des tours de garde", "ses moi qui a les zeu", "M TOUKA POOM CHALLENGE, TU DOIS SHOTGUN UNE TWISTED TEA", "quesse tu vas prendre dans ton subway?\np-o: OUA"
  "j'ai 4 matchs avec des tsites inchaudes tinedeur", "okok j'ai une ostie de bonne idée\nun bidet... au froumage"]
 
+insultes = ["Fais pas ta tapet", "Criss de centriste", "Ferme ta criss de gueule", 
+"lmak ton manteau sent beaucoup trop le weed", "Tayeule gros fif", "T'es juste une moumoune"]
 
 @app.route('/', methods=['GET'])
 # Webhook verification
