@@ -111,7 +111,7 @@ def handle_stat_req(message):
     connection = MongoClient(MONGODB_URI)
     database = connection[DBS_NAME]
     members = database['members']
-    messages = database['messages_23avril2020']
+    messages = database['messages']
     pseudos = {author['name'] : author['pseudo'] for author in list(members.find())}
     connection.close()
     msg = ""
