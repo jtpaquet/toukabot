@@ -45,20 +45,20 @@ def handle_verification():
 @app.route('/', methods=['POST'])
 def handle_messages():
     data = request.get_json()
-    log(data)
-	
     if data["object"] == "page":
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
 
                 if messaging_event.get("message"):
                     sender_id = messaging_event["sender"]["id"]
-                    # recipient_id = messaging_event["recipient"]["id"]
+                    recipient_id = messaging_event["recipient"]["id"]
                     if "text" in messaging_event["message"].keys():
                         message_text = str(messaging_event["message"]["text"])
                         send_message(sender_id, message_text)
                     else:
                         send_message(sender_id, "")
+                        
+                    log(json.dumps({"recipient id": recipient_id, "text": message_text}))
 
                 if messaging_event.get("delivery"):
                     pass
@@ -97,9 +97,9 @@ def send_message(recipient_id, message_text):
     })
     log(data)
     r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        log(r.status_code)
-    log(r.text)
+    # if r.status_code != 200:
+    #     log(r.status_code)
+    # log(r.text)
 
 
 def log(message):  # simple wrapper for logging to stdout on heroku
